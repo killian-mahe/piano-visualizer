@@ -1,0 +1,134 @@
+Objectifs de l'application
+==========================
+L'objectif principal est d'apprendre à implémenter différentes IHM en se basant sur les patrons de conception :
+     - observer
+     - MVC
+
+On se propose donc de developper une application interactive pour :
+  - creer des sons
+  - les visualiser sous forme d'onde
+  - jouer les sons (notes) sur un clavier de piano sur 1 puis 2 octaves puis 3 ...
+  - apprendre a reconnaitre les notes au piano (afficher le nom des notes,visualiser la touche correspondante)
+  - creer des accords majeurs (tonalite-tierce-quinte) a partir des notes  (exemple accord Do majeur : C-E-G)
+  - jouer les accords sur un clavier de piano sur 1 puis 2 octaves puis 3 ...
+  - apprendre a reconnaitre les accords au piano (afficher le nom et les notes des accords,visualiser les touches correspondantes ...) 
+
+Puis, pour aller plus loin :
+  - apprendre a jouer des renversements d'accords !
+
+Etapes à suivre 
+===============
+
+1) wave_visualizer.py : Proposer et implementer une IHM pour visualiser un son pur puis un son (une note) avec ses harmoniques.
+
+2) wave_generator.py : Proposer et implementer une IHM pour creer des sons (notes pures puis harmoniques) au format wav.
+
+3) keyboard.py : Proposer et implementer une IHM pour jouer des notes sur un clavier a 1 octave
+
+4) piano.py : Proposer et implementer une IHM pour jouer des notes sur un clavier de piano a 1 puis 2 puis 3... octaves
+
+5) main.py : integration des trois versions precedentes dans une seule IHM
+
+6) Enrichir l'IHM du piano pour :
+     - apprendre a reconnaitre les notes sur le clavier
+     - visualiser et jouer des accords au piano
+     - visualiser et jouer les accords et leur renversement
+
+
+Répertoires
+===========
+
+Audio
+-----
+  - frequencies.py : 
+  - frequencies.py, frequencies.db : stocker dans une table de BD la frequence des notes de gammes musicales
+  - audio_wav.py :  creer des fichiers au format wav pour une frequence (note) donnee (cf : Fabrice Sincere ; Jean-Claude Meilland, ...)
+  - note_read.py,note_save.py : tests de lecture/écriture de fichier au format wav
+  - create_chords.py  :  creation d'un accord  (3 notes) au format wav 
+  - wav_create_note-0.py : creation d'un son (note) au format wav
+  - wav_read_note-0.py : lecture  d'un son (note) au format wav
+  - create_notes_from_db.py : creation des notes a partir de la base de données (frequencies.db) 
+
+Utils : fonctions utiles
+-----
+
+Chords : pour la sauvegarde des accords
+------
+
+Sounds : pour la sauvegarde des notes
+------
+
+
+Annexes
+=======
+
+Liens utiles pour mettre en place cette application interactive :
+
+ - http://fsincere.free.fr/isn/python/cours_python_ch9.php
+ - http://freesoundeditor.com/docwave.htm
+ - http://blog.acipo.com/wave-generation-in-python
+ - https://www.tutorialspoint.com/read-and-write-wav-files-using-python-wave
+ - https://www.programcreek.com/python/example/82393/wave.open
+ - https://f5zv.pagesperso-orange.fr/RADIO/RM/RM23/RM23B/RM23B04.htm
+ - http://tpecan.free.fr/index.php?page=echantillonnage
+ 
+
+Archives
+========
+
+En fin d'après-midi (17h) rendre une archive du travail du repertoire :  
+Nom_Prenom_Piano
+├── Audio
+│   ├── audio_wav.py
+│   ├── create_chords.py
+│   ├── create_notes_from_db.py
+│   ├── frequencies.db
+│   ├── frequencies.py
+│   ├── note_read.py
+│   ├── note_save.py
+│   └── __pycache__
+│       ├── audio_wav.cpython-37.pyc
+│       └── wav_audio.cpython-37.pyc
+├── Chords
+├── Docs
+│   ├── CAI_Tkinter.pdf
+│   ├── tkinter_nmt.pdf
+│   └── wav_pointal.pdf
+├── keyboard.py
+├── main.py
+├── observer.py
+├── piano.py
+├── __pycache__
+│   ├── keyboard.cpython-37.pyc
+│   ├── listes.cpython-37.pyc
+│   ├── observer.cpython-37.pyc
+│   ├── piano.cpython-37.pyc
+│   ├── signal_visualizer.cpython-37.pyc
+│   ├── wave_generator.cpython-37.pyc
+│   └── wave_visualizer.cpython-37.pyc
+├── Sounds
+│   └── sound.wav
+├── TODO.txt
+├── Utils
+│   ├── combo.py
+│   ├── __init__.py
+│   ├── listes.py
+│   ├── menubar.py
+│   ├── path_to_files.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-37.pyc
+│   │   └── listes.cpython-37.pyc
+│   └── wave_create.py
+├── wave_generator.py
+└── wave_visualizer.py
+
+En fin de seance pour le binome Dupond-Dupont générer l'archive : 
+  -Dupond_Dupont_Piano.tgz
+du repertoire 
+  - Dupond_Dupont_Piano
+par la commande "tar" :
+{logname@hostname} tar zcvf Dupond_Dupont_Piano.tgz Dupond_Dupont_Piano
+et deposer l'archive sous le repertoire  /home/TP/TPrendu/nedelec/CAI/TkInter :
+{logname@hostname} cp Dupond_Dupont_Piano.tgz /home/TP/TPrendu/nedelec/CAI/TkInter
+
+
