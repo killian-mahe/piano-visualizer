@@ -17,6 +17,33 @@ else :
     from tkinter import filedialog 
 
 from Utils.listes import *
+from observer import Observer, Subject
+
+class Interface(Observer):
+    def __init__(self, parent, width=600, height=600):
+        Observer.__init__(self)
+    
+    def packing(self):
+        return
+
+class Generator(Subject):
+    def __init__(self):
+        Subject.__init__(self)
+
+class Controller:
+    def __init__(self, parent, model, view):
+        self.model = model
+        self.view = view
+        self.notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
+        self.create_controls(parent)
+
+    def create_controls(self, parent):
+        self.menu = Menubar(parent)
+        self.frame = tk.LabelFrame(mw, text="Generator ", borderwidth=5, width=400, height=300, bg="pink")
+
+    def packing(self):
+        self.frame.pack()
+
 
 class Menubar(tk.Frame):
     def __init__(self,parent=None):
@@ -38,12 +65,12 @@ if __name__ == "__main__" :
     mw=tk.Tk()
     mw.geometry("360x300")
     mw.title("Generateur de fichier au format WAV")
-    menubar=Menubar(mw)
-    frame=tk.LabelFrame(mw, text="Generator ",borderwidth=5,width=400,height=300,bg="pink")
-    notes=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
-    selection= Selection(frame)
-    menu=ListMenu(frame,"notes",notes,selection)
-    menu.packing()
-    selection.packing()
-    frame.pack()
+
+    model = Generator()
+    view = Interface(mw)
+    view.packing()
+
+    ctrl = Controller(mw, model, view)
+    ctrl.packing()
+
     mw.mainloop()
