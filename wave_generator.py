@@ -16,8 +16,12 @@ else :
     import tkinter as tk
     from tkinter import filedialog 
 
+import shutil
 from Utils.listes import ListMenu
 from observer import Observer, Subject
+from Utils.path_to_files import is_file
+from Audio import audio_wav
+import sqlite3
 import subprocess
 
 class Interface(Observer):
@@ -89,8 +93,26 @@ class Generator(Subject):
         self.notify()
         pass
 
+    def get_frequency(self, note, octave = 4):
+        connect = sqlite3.connect("Audio/frequencies.db")
+        cursor = connect.cursor()
+        result = cursor.execute("SELECT \"{}\" FROM frequencies WHERE octave={};".format(note.replace('#', "Sharp"), octave))
+        connect.commit()
+        result = result.fetchone()[0]
+        connect.close()
+
+        return result
+
     def generateNote(self, note, octave=4):
-        print('You want to print', note, octave)
+        file_name = str(note)+str(octave)+'.wav'
+        folder = 'Sounds'
+
+        if not is_file(folder, file_name) :
+            freq = self.get_frequency(note, octave)
+            audio_wav.save_note_wav(folder+'/'+file_name, freq, 2*freq)
+        
+        subprocess.call(["aplay", 'Sounds/'+file_name])
+
         pass
 
 class Controller:

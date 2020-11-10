@@ -11,11 +11,23 @@ import sqlite3
 import subprocess
 from audio_wav import save_note_wav
 
+def get_frequency(note, octave = 4):
+    connect = sqlite3.connect("frequencies.db")
+    cursor = connect.cursor()
+    result = cursor.execute("SELECT {} FROM frequencies WHERE octave={};".format(note, octave))
+    connect.commit()
+    connect.close()
+    
+    if len(result) :
+        return result[0][0]
+    
+    return -1
+
 if  __name__ == "__main__" :
     connect = sqlite3.connect("frequencies.db")
     cursor = connect.cursor()
     gammes=cursor.execute("SELECT * FROM frequencies")
-
+    
     notes=["octave","C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
     for gamme in gammes :       # toutes les gammes 
         if 3 < gamme[0] < 5  :  # Gamme de degre 4 de reference, La (A) 440 Hz )

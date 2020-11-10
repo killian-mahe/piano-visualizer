@@ -11,9 +11,9 @@ def is_directory(path) :
 def is_file(path=".",name="README.md") :
     exists=False
     if is_directory(path) :
-        message="Le dossier  : ",directory," existe bien"
+        message="Le dossier  : ",path," existe bien"
         print(message)
-        print("Le dossier  : ",directory," existe bien")
+        print("Le dossier  : ",path," existe bien")
         # logging.debug(message)
         path_to_file=path+'/'+name
         if os.path.isfile(path_to_file):
