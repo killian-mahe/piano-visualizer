@@ -53,11 +53,10 @@ class Screen(Observer):
     """ Octave View """
     def __init__(self,parent) :
         self.parent=parent
-        self.create_screen()
-    def create_screen(self) :
         self.screen=tk.Frame(self.parent,borderwidth=5,width=500,height=160,bg="pink")
         self.info=tk.Label(self.screen,text="Appuyez sur une touche clavier ",bg="pink",font=('Arial',10))
-        self.info.pack()
+        self.packing()
+
     def get_screen(self) :
         return self.screen
 
@@ -69,6 +68,10 @@ class Screen(Observer):
         subprocess.call(["aplay",model.get_gamme()[key]])
         if self.info :
             self.info.config(text="Vous avez joue la note: "+ key + str(model.get_degree()))
+            
+    def packing(self):
+        self.info.pack()
+        pass
     
 
 class Keyboard :

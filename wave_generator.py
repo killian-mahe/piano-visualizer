@@ -28,9 +28,8 @@ class Interface(Observer):
     def __init__(self, parent, width=600, height=600):
         Observer.__init__(self)
         self.frame = tk.LabelFrame(parent, text="Generator ", borderwidth=5, padx=20, pady=20)
-        self.menu = Menubar(parent)
-        self.notes = []
-        self.generatedNotes = []
+        # self.menu = Menubar(parent)
+        self.notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
         self.octave = tk.IntVar()
         self.octave.set(4)
 
@@ -44,10 +43,6 @@ class Interface(Observer):
 
         # Generate Button
         self.generateButton = tk.Button(self.frame, text="Generate")
-
-        # Generated notes
-        self.arrowLabel = tk.Label(self.frame, text="=>", padx=20)
-        self.generatedNoteList = tk.Listbox(self.frame, height=15, bd=4, selectborderwidth=1)
         pass
 
     def update(self, model):
@@ -62,15 +57,12 @@ class Interface(Observer):
         self.noteList.grid(column=1, row=0)
         self.generateButton.grid(column=0, columnspan=2, row=1)
         self.octaveScale.grid(column=0, row=0)
-        self.arrowLabel.grid(column=2, row=0)
-        self.generatedNoteList.grid(column=3, row=0)
         return
 
 class Generator(Subject):
     def __init__(self):
         Subject.__init__(self)
         self.__notes = []
-        self.__generatedNotes = []
         pass
     
     @property
@@ -80,16 +72,6 @@ class Generator(Subject):
     @notes.setter
     def notes(self, notes):
         self.__notes = notes
-        self.notify()
-        pass
-
-    @property
-    def generatedNotes(self):
-        return self.__generatedNotes;
-
-    @generatedNotes.setter
-    def generatedNotes(self, notes):
-        self.__generatedNotes = notes;
         self.notify()
         pass
 
@@ -118,7 +100,6 @@ class Generator(Subject):
 class Controller:
     def __init__(self, parent, model : Generator, view : Interface):
         self.model = model
-        self.model.notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
         self.view = view
         self.view.generateButton.bind("<Button-1>", self.on_note_generate)
         pass
