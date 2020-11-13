@@ -17,6 +17,7 @@ from math import pi,sin
 import collections
 import subprocess
 import sqlite3
+import time
 
 from observer import *
 from piano import *
@@ -66,15 +67,35 @@ class Generator():
         pass
 
 class Controller:
-    def __init__(self, generator, piano, visualizer):
+    def __init__(self, generator : Generator, piano : Piano, visualizer : Visualizer):
         self.generator = generator
         self.piano = piano
         self.visualizer = visualizer
 
-        self.notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
+        self.piano.control.on_click= self.on_keyboard_click
+        self.generator.view.generateButton.bind("<Button-1>", self.on_note_generate)
+        self.generator.view.playButton.bind("<Button-1>", self.on_note_play)
         pass
 
-    def on_note_generate(self):
+    def on_note_generate(self, event):
+        note = self.generator.view.noteList.get('active')
+        self.generator.model.generateNote(self.generator.view.noteList.get('active'), self.generator.view.octave.get())
+        freq = self.generator.model.get_frequency(note, 4)
+        self.visualizer.model.set_frequency(freq)
+        self.visualizer.model.generate_signal()
+        pass
+    
+    def on_keyboard_click(self, key):
+        freq = self.generator.model.get_frequency(key, 4)
+        self.visualizer.model.set_frequency(freq)
+        self.visualizer.model.generate_signal()
+        pass
+
+    def on_note_play(self, event):
+        note = self.generator.view.noteList.get('active')
+        self.piano.control.show_note([note])
+        self.piano.control.play_note(note)
+        self.piano.control.reset_note()
         pass
 
 

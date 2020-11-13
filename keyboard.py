@@ -76,19 +76,21 @@ class Screen(Observer):
 
 class Keyboard :
     """ Octave controller """
-    def __init__(self,parent,model) :
+    def __init__(self,parent,model, on_click=False) :
         self.parent=parent
         self.model=model
+        self.buttons = {}
+        self.on_click = on_click
         self.create_keyboard()
-    def create_keyboard(self,key_w=40,key_h=150) :
-        # key_w,key_h=40,150
+    def create_keyboard(self, key_w=40,key_h=150) :
+        
         dx_white,dx_black=0,0
         self.keyboard=tk.Frame(self.parent,borderwidth=3, width=7.2*key_w,height=1.05*key_h,bg="red")
         for key in self.model.gamme.keys() :
             if key.startswith('#',1,len(key)) :
                 delta_w,delta_h=3/4.,2/3.
                 delta_x=3/5.
-                button=tk.Button(self.keyboard,name=key.lower(),width=3,height=6,bg="black")
+                button=tk.Button(self.keyboard,text=key, anchor="s",name=key.lower(), fg="white",width=3,height=6,bg="black")
                 button.bind("<Button-1>",lambda event,x=key : self.play_note(x))
                 button.place(width=key_w*delta_w,height=key_h*delta_h,x=key_w*delta_x+key_w*dx_black,y=0)
                 if key.startswith('D#',0,len(key) ) :
@@ -96,14 +98,32 @@ class Keyboard :
                 else :
                     dx_black=dx_black+1
             else :
-                button=tk.Button(self.keyboard,name=key.lower(),bg = "white")
+                button=tk.Button(self.keyboard,text=key, anchor="s",name=key.lower(),bg = "white")
                 button.bind("<Button-1>",lambda event,x=key : self.play_note(x))
                 button.place(width=key_w,height=key_h,x=key_w*dx_white,y=0)
                 dx_white=dx_white+1
+            self.buttons[key] = button
 
     def play_note(self,key) :
         """Octave Controller Action"""
         self.model.notify(key)
+        if (self.on_click) :
+            self.on_click(key)
+    
+    def show_note(self, keys):
+        for key in keys:
+            button = self.buttons.get(key)
+            bg = button.config('bg')[-1]
+            button.configure(bg = 'sky blue')
+        pass
+
+    def reset_note(self):
+        for key, val in self.buttons.items():
+            if key.startswith('#',1,len(key)):
+                val.configure(bg = 'black')
+            else:
+                val.configure(bg = 'white')
+
     def get_keyboard(self) :
         return self.keyboard
     def get_degrees(self) :

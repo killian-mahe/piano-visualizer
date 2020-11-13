@@ -43,6 +43,9 @@ class Interface(Observer):
 
         # Generate Button
         self.generateButton = tk.Button(self.frame, text="Generate")
+
+        # Play Button
+        self.playButton = tk.Button(self.frame, text="Play")
         pass
 
     def update(self, model):
@@ -55,7 +58,8 @@ class Interface(Observer):
     def packing(self):
         self.frame.pack()
         self.noteList.grid(column=1, row=0)
-        self.generateButton.grid(column=0, columnspan=2, row=1)
+        self.generateButton.grid(column=0, row=1)
+        self.playButton.grid(column=1, row=1)
         self.octaveScale.grid(column=0, row=0)
         return
 
@@ -93,8 +97,6 @@ class Generator(Subject):
             freq = self.get_frequency(note, octave)
             audio_wav.save_note_wav(folder+'/'+file_name, freq, 2*freq)
         
-        subprocess.call(["aplay", 'Sounds/'+file_name])
-
         pass
 
 class Controller:

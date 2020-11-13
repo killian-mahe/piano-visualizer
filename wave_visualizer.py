@@ -42,7 +42,7 @@ class Visualizer(Subject):
     def set_phase(self, p):
         self.p = p
     
-    def generate_signal(self, period=2, samples=100.0):
+    def generate_signal(self, period=3, samples=500.0):
         del self.signal[0:]
         echantillons=range(int(samples) + 1)
         Tech = period / samples
