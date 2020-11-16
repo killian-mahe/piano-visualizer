@@ -30,6 +30,7 @@ class Interface(Observer):
         self.frame = tk.LabelFrame(parent, text="Generator ", borderwidth=5, padx=20, pady=20)
         # self.menu = Menubar(parent)
         self.notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
+        self.chordsList = [["C", "E", "G"]]
         self.octave = tk.IntVar()
         self.octave.set(4)
 
@@ -45,7 +46,13 @@ class Interface(Observer):
         self.generateButton = tk.Button(self.frame, text="Generate")
 
         # Play Button
-        self.playButton = tk.Button(self.frame, text="Play")
+        self.playButton = tk.Button(self.frame, text="Play note")
+        self.playChordButton = tk.Button(self.frame, text="Play chord")
+
+        # Chords selection
+        self.chordsSelection = tk.Listbox(self.frame, height=15, bd=4, selectborderwidth=1)
+        for chord in self.chordsList:
+            self.chordsSelection.insert("end", ", ".join(chord))
         pass
 
     def update(self, model):
@@ -61,6 +68,8 @@ class Interface(Observer):
         self.generateButton.grid(column=0, row=1)
         self.playButton.grid(column=1, row=1)
         self.octaveScale.grid(column=0, row=0)
+        self.chordsSelection.grid(column=2, row=0)
+        self.playChordButton.grid(column=2, row=1)
         return
 
 class Generator(Subject):
@@ -97,6 +106,32 @@ class Generator(Subject):
             freq = self.get_frequency(note, octave)
             audio_wav.save_note_wav(folder+'/'+file_name, freq, 2*freq)
         
+        pass
+
+    def generateChord(self, notes, octave=4):
+        chord_name = "".join(notes)+".wav"
+        sound_folder = 'Sounds'
+        chord_folder = 'Chords'
+        chords = []
+        data = []
+
+        if is_file(chord_folder, chord_name):
+            print('Already generated !')
+            return
+
+        for note in notes:
+            self.generateNote(note, octave)
+            file_name = str(note)+str(octave)+'.wav'
+            chords.append(audio_wav.open_wav(sound_folder+ '/' +file_name))
+
+        for i in range(len(chords[0][0])):
+            sum = 0
+            for j in range(len(chords)):
+                sum += chords[j][0][i]
+            data.append(sum/len(chords))
+
+        audio_wav.save_wav(chord_name,data,chords[0][1])
+        shutil.move(chord_name, chord_folder+'/'+chord_name)
         pass
 
 class Controller:

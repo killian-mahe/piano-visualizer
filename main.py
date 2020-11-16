@@ -75,6 +75,7 @@ class Controller:
         self.piano.control.on_click= self.on_keyboard_click
         self.generator.view.generateButton.bind("<Button-1>", self.on_note_generate)
         self.generator.view.playButton.bind("<Button-1>", self.on_note_play)
+        self.generator.view.playChordButton.bind("<Button-1>", self.on_chord_play)
         pass
 
     def on_note_generate(self, event):
@@ -86,6 +87,8 @@ class Controller:
         pass
     
     def on_keyboard_click(self, key):
+        if type(key) is list:
+            return
         freq = self.generator.model.get_frequency(key, 4)
         self.visualizer.model.set_frequency(freq)
         self.visualizer.model.generate_signal()
@@ -93,9 +96,17 @@ class Controller:
 
     def on_note_play(self, event):
         note = self.generator.view.noteList.get('active')
+        self.piano.control.reset_note()
         self.piano.control.show_note([note])
         self.piano.control.play_note(note)
+        pass
+
+    def on_chord_play(self, event):
+        chord = self.generator.view.chordsSelection.get("active")
+        self.generator.model.generateChord(chord.split(', '))
         self.piano.control.reset_note()
+        self.piano.control.show_note(chord.split(', '))
+        self.piano.control.play_note(chord.split(', '))
         pass
 
 

@@ -28,6 +28,8 @@ class Octave(Subject) :
     """ Octave Model """
     def __init__(self,degree=3) :
         Subject.__init__(self)
+        self.sound_folder = 'Sounds'
+        self.chord_folder = 'Chords'
         self.degree=degree
         self.set_sounds_to_gamme(degree)
     def get_gamme(self) :
@@ -46,7 +48,7 @@ class Octave(Subject) :
         notes=["C","D","E","F","G","A","B","C#","D#","F#","G#","A#"]
         self.gamme=collections.OrderedDict()
         for key in notes :
-            self.gamme[key]="Sounds/"+key+str(degree)+".wav"
+            self.gamme[key]=self.sound_folder+"/"+key+str(degree)+".wav"
         return self.gamme
 
 class Screen(Observer):
@@ -62,9 +64,10 @@ class Screen(Observer):
 
     def update(self,model,key="C") :
         """Octave View update"""
-        if __debug__:
-            if key not in model.gamme.keys() :
-                raise AssertionError
+        if type(key) is list:
+            chord = "".join(key)
+            subprocess.call(["aplay", model.chord_folder+"/"+chord+".wav"])
+            return
         subprocess.call(["aplay",model.get_gamme()[key]])
         if self.info :
             self.info.config(text="Vous avez joue la note: "+ key + str(model.get_degree()))
