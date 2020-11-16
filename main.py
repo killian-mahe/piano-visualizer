@@ -64,6 +64,7 @@ class Generator():
         self.view.packing()
         self.model = generator.Generator()
         self.model.attach(self.view)
+        self.control = generator.Controller(self.frame, self.model, self.view)
         pass
 
 class Controller:
@@ -80,7 +81,6 @@ class Controller:
 
     def on_note_generate(self, event):
         note = self.generator.view.noteList.get('active')
-        self.generator.model.generateNote(self.generator.view.noteList.get('active'), self.generator.view.octave.get())
         freq = self.generator.model.get_frequency(note, 4)
         self.visualizer.model.set_frequency(freq)
         self.visualizer.model.generate_signal()
@@ -96,16 +96,12 @@ class Controller:
 
     def on_note_play(self, event):
         note = self.generator.view.noteList.get('active')
-        self.piano.control.reset_note()
-        self.piano.control.show_note([note])
         self.piano.control.play_note(note)
         pass
 
     def on_chord_play(self, event):
         chord = self.generator.view.chordsSelection.get("active")
         self.generator.model.generateChord(chord.split(', '))
-        self.piano.control.reset_note()
-        self.piano.control.show_note(chord.split(', '))
         self.piano.control.play_note(chord.split(', '))
         pass
 

@@ -17,6 +17,7 @@ else :
     from tkinter import filedialog 
 
 import shutil
+import copy
 from Utils.listes import ListMenu
 from observer import Observer, Subject
 from Utils.path_to_files import is_file
@@ -30,7 +31,6 @@ class Interface(Observer):
         self.frame = tk.LabelFrame(parent, text="Generator ", borderwidth=5, padx=20, pady=20)
         # self.menu = Menubar(parent)
         self.notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
-        self.chordsList = [["C", "E", "G"]]
         self.octave = tk.IntVar()
         self.octave.set(4)
 
@@ -46,36 +46,59 @@ class Interface(Observer):
         self.generateButton = tk.Button(self.frame, text="Generate")
 
         # Play Button
-        self.playButton = tk.Button(self.frame, text="Play note")
-        self.playChordButton = tk.Button(self.frame, text="Play chord")
+        self.playButton = tk.Button(self.frame, text="Play note", bg="light sky blue")
+        self.playChordButton = tk.Button(self.frame, text="Play chord", bg="light sky blue")
+
+        # Chords prepate
+        self.addToChord = tk.Button(self.frame, text="Add to chord => ")
+        self.chordPrepareListbox = tk.Listbox(self.frame, height=5, bd=4, selectborderwidth=1)
+
+        # Generate chord
+        self.generateChord = tk.Button(self.frame, text="Generate chord")
 
         # Chords selection
         self.chordsSelection = tk.Listbox(self.frame, height=15, bd=4, selectborderwidth=1)
-        for chord in self.chordsList:
-            self.chordsSelection.insert("end", ", ".join(chord))
-        pass
 
     def update(self, model):
         self.notes = model.notes
-        self.noteList.delete(0)
+        self.noteList.delete(0, 'end')
+        self.chordsSelection.delete(0, 'end')
+        self.chordPrepareListbox.delete(0, 'end')
+
         for note in self.notes:
             self.noteList.insert("end", note)
+
+        for chord in model.chordsList:
+            self.chordsSelection.insert("end", ", ".join(chord))
+    
+        for note in model.chordInPrepare:
+            self.chordPrepareListbox.insert("end", note)
+        
         pass
     
     def packing(self):
         self.frame.pack()
-        self.noteList.grid(column=1, row=0)
         self.generateButton.grid(column=0, row=1)
-        self.playButton.grid(column=1, row=1)
         self.octaveScale.grid(column=0, row=0)
-        self.chordsSelection.grid(column=2, row=0)
-        self.playChordButton.grid(column=2, row=1)
+
+        self.noteList.grid(column=1, row=0)
+        self.playButton.grid(column=1, row=1)
+        
+        self.addToChord.grid(column=2, row=0)
+
+        self.chordPrepareListbox.grid(column=3, row=0)
+        self.generateChord.grid(column=3, row=1)
+
+        self.chordsSelection.grid(column=4, row=0)
+        self.playChordButton.grid(column=4, row=1)
         return
 
 class Generator(Subject):
     def __init__(self):
         Subject.__init__(self)
-        self.__notes = []
+        self.__notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
+        self.chordInPrepare = []
+        self.chordsList = [["C", "E", "G"]]
         pass
     
     @property
@@ -86,6 +109,18 @@ class Generator(Subject):
     def notes(self, notes):
         self.__notes = notes
         self.notify()
+        pass
+
+    def add_note_to_chord(self, note):
+        self.chordInPrepare.append(note)
+        self.notify()
+        pass
+
+    def create_chord(self):
+        if len(self.chordInPrepare) > 1:
+            self.chordsList.append(copy.copy(self.chordInPrepare))
+            self.chordInPrepare.clear()
+            self.notify()
         pass
 
     def get_frequency(self, note, octave = 4):
@@ -139,11 +174,22 @@ class Controller:
         self.model = model
         self.view = view
         self.view.generateButton.bind("<Button-1>", self.on_note_generate)
+        self.view.addToChord.bind("<Button-1>", self.composeChord)
+        self.view.generateChord.bind("<Button-1>", self.generateChord)
         pass
     
     def on_note_generate(self, event):
-        note = self.view.noteList.get('active')
+        note = str(self.view.noteList.get('active'))
         self.model.generateNote(self.view.noteList.get('active'), self.view.octave.get())
+        pass
+
+    def composeChord(self, event):
+        note = self.view.noteList.get('active')
+        self.model.add_note_to_chord(note)
+        pass
+
+    def generateChord(self, event):
+        self.model.create_chord()
         pass
 
 
