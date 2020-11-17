@@ -20,7 +20,7 @@ import sqlite3
 import time
 
 from observer import *
-from piano import *
+import piano as p
 import wave_generator  as generator
 import wave_visualizer as visualizer
 import keyboard 
@@ -34,14 +34,9 @@ menubar=generator.Menubar(mw)
 class Piano():
     def __init__(self, parent):
         self.frame = tk.Frame(parent, borderwidth=5)
-        self.model = keyboard.Octave(4)
-        self.view = keyboard.Screen(self.frame)
-        self.model.attach(self.view)
-        self.control = keyboard.Keyboard(self.frame, self.model)
-
-        # keyboard packing
-        self.view.get_screen().pack()
-        self.control.get_keyboard().pack()
+        self.octaves = []
+        piano = p.Piano(self.frame, 4)
+        self.octaves = piano.octaves
         pass
 
 class Visualizer():
@@ -60,7 +55,7 @@ class Visualizer():
 class Generator():
     def __init__(self, parent):
         self.frame = tk.Frame(parent)
-        self.view = generator.Interface(self.frame)
+        self.view = generator.Interface(self.frame, from_=2, to=5)
         self.view.packing()
         self.model = generator.Generator()
         self.model.attach(self.view)
@@ -73,7 +68,8 @@ class Controller:
         self.piano = piano
         self.visualizer = visualizer
 
-        self.piano.control.on_click= self.on_keyboard_click
+        for octave in self.piano.octaves:
+            octave.on_click = self.on_keyboard_click
         self.generator.view.generateButton.bind("<Button-1>", self.on_note_generate)
         self.generator.view.playButton.bind("<Button-1>", self.on_note_play)
         self.generator.view.playChordButton.bind("<Button-1>", self.on_chord_play)
@@ -81,28 +77,37 @@ class Controller:
 
     def on_note_generate(self, event):
         note = self.generator.view.noteList.get('active')
-        freq = self.generator.model.get_frequency(note, 4)
+        degree = self.generator.view.octaveScale.get()
+        freq = self.generator.model.get_frequency(note, degree)
+        self.generator.model.generateNote(note, degree)
         self.visualizer.model.set_frequency(freq)
         self.visualizer.model.generate_signal()
         pass
     
-    def on_keyboard_click(self, key):
+    def on_keyboard_click(self, key, degree):
         if type(key) is list:
             return
-        freq = self.generator.model.get_frequency(key, 4)
-        self.visualizer.model.set_frequency(freq)
+        self.visualizer.model.set_frequency(self.generator.model.get_frequency(key, degree))
         self.visualizer.model.generate_signal()
         pass
 
     def on_note_play(self, event):
         note = self.generator.view.noteList.get('active')
-        self.piano.control.play_note(note)
+        degree = self.generator.view.octaveScale.get()
+        if 1 < degree < 5:
+            self.piano.octaves[degree-2].play_note(note)
         pass
 
     def on_chord_play(self, event):
-        chord = self.generator.view.chordsSelection.get("active")
-        self.generator.model.generateChord(chord.split(', '))
-        self.piano.control.play_note(chord.split(', '))
+        chord = self.generator.view.chordsSelection.get('active').split(', ')
+        self.generator.model.play_notes(chord)
+
+        for octave in self.piano.octaves:
+            octave.reset_note()
+
+        for note in chord:
+            degree = note[-1::]
+            self.piano.octaves[int(degree)-2].show_note(note[0:-1])
         pass
 
 

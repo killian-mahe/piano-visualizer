@@ -39,7 +39,7 @@ class Piano :
         model.attach(view)
         control.get_keyboard().grid(column=degree,row=0)
         view.get_screen().grid(column=degree,row=1)
-        self.octaves.append(model)
+        self.octaves.append(control)
 
 if __name__ == "__main__" :
     mw = tk.Tk()

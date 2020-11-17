@@ -109,15 +109,12 @@ class Keyboard :
 
     def play_note(self,key) :
         """Octave Controller Action"""
-        self.reset_note()
-        self.show_note(key)
         self.model.notify(key)
         if (self.on_click) :
-            self.on_click(key)
+            self.on_click(key, self.model.degree)
     
     def show_note(self, keys):
         for key in keys:
-            print(self.buttons)
             button = self.buttons.get(key)
             button.configure(bg = 'sky blue')
         pass

@@ -26,7 +26,7 @@ import sqlite3
 import subprocess
 
 class Interface(Observer):
-    def __init__(self, parent, width=600, height=600):
+    def __init__(self, parent, width=600, height=600, from_=1, to=10):
         Observer.__init__(self)
         self.frame = tk.LabelFrame(parent, text="Generator ", borderwidth=5, padx=20, pady=20)
         # self.menu = Menubar(parent)
@@ -40,7 +40,7 @@ class Interface(Observer):
             self.noteList.insert("end", note)
 
         # Octave selection
-        self.octaveScale = tk.Scale(self.frame, variable=self.octave, label="Octave", orient="vertical", length=350, from_=-1, to=10, tickinterval=1)
+        self.octaveScale = tk.Scale(self.frame, variable=self.octave, label="Octave", orient="vertical", length=350, from_=from_, to=to, tickinterval=1)
 
         # Generate Button
         self.generateButton = tk.Button(self.frame, text="Generate")
@@ -98,7 +98,7 @@ class Generator(Subject):
         Subject.__init__(self)
         self.__notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
         self.chordInPrepare = []
-        self.chordsList = [["C", "E", "G"]]
+        self.chordsList = [["C4", "E4", "G4"]]
         pass
     
     @property
@@ -111,13 +111,24 @@ class Generator(Subject):
         self.notify()
         pass
 
-    def add_note_to_chord(self, note):
-        self.chordInPrepare.append(note)
+    def play_notes(self, notes, octave=4):
+        if type(notes) is list:
+            self.generateChord(notes)
+            chord = "".join(notes)
+            subprocess.call(["aplay", "Chords/"+chord+".wav"])
+        else:
+            self.generateNote(notes, octave)
+            subprocess.call(["aplay", "Sounds/"+notes+str(octave)+".wav"])
+        pass
+
+    def add_note_to_chord(self, note, degree):
+        self.chordInPrepare.append(note+str(degree))
         self.notify()
         pass
 
     def create_chord(self):
         if len(self.chordInPrepare) > 1:
+            self.generateChord(copy.copy(self.chordInPrepare))
             self.chordsList.append(copy.copy(self.chordInPrepare))
             self.chordInPrepare.clear()
             self.notify()
@@ -143,7 +154,7 @@ class Generator(Subject):
         
         pass
 
-    def generateChord(self, notes, octave=4):
+    def generateChord(self, notes):
         chord_name = "".join(notes)+".wav"
         sound_folder = 'Sounds'
         chord_folder = 'Chords'
@@ -155,8 +166,8 @@ class Generator(Subject):
             return
 
         for note in notes:
-            self.generateNote(note, octave)
-            file_name = str(note)+str(octave)+'.wav'
+            self.generateNote(note[0:-1], note[-1::])
+            file_name = str(note)+'.wav'
             chords.append(audio_wav.open_wav(sound_folder+ '/' +file_name))
 
         for i in range(len(chords[0][0])):
@@ -176,20 +187,30 @@ class Controller:
         self.view.generateButton.bind("<Button-1>", self.on_note_generate)
         self.view.addToChord.bind("<Button-1>", self.composeChord)
         self.view.generateChord.bind("<Button-1>", self.generateChord)
+        self.view.playChordButton.bind("<Button-1>", self.playChord)
+        self.view.playButton.bind("<Button-1>", self.playNote)
         pass
     
     def on_note_generate(self, event):
-        note = str(self.view.noteList.get('active'))
         self.model.generateNote(self.view.noteList.get('active'), self.view.octave.get())
         pass
 
     def composeChord(self, event):
-        note = self.view.noteList.get('active')
-        self.model.add_note_to_chord(note)
+        self.model.add_note_to_chord(self.view.noteList.get('active'), self.view.octave.get())
         pass
 
     def generateChord(self, event):
         self.model.create_chord()
+        pass
+
+    def playChord(self, event):
+        self.model.play_notes(self.view.chordsSelection.get('active').split(', '))
+        pass
+
+    def playNote(self, event):
+        note = self.view.noteList.get('active')
+        degree = self.view.octaveScale.get()
+        self.model.play_notes(note, degree)
         pass
 
 
